@@ -1,6 +1,12 @@
 name: Test Python package
 
-on: [push, pull_request]
+on:
+  push
+  pull_request
+  workflow_dispatch:
+    inputs:
+      note:
+        description: "note"
 
 jobs:
   build:
