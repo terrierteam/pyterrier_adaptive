@@ -92,3 +92,16 @@ using `.to_limit_k(k)`
 graph16 = CorpusGraph.load('msmarco-passage.gbm25.16')
 graph8 = graph16.to_limit_k(8)
 ```
+
+# Citation
+
+Adaptive Re-Ranking with a Corpus Graph. Sean MacAvaney, Nicola Tonellotto and Craig Macdonald. In Proceedings of CIKM 2022, accepted.
+
+```bibtex
+@inproceedings{gar2022,
+  title = {Adaptive Re-Ranking with a Corpus Graph},
+  booktitle = {Proceedings of ACM CIKM},
+  author = {Sean MacAvaney and Nicola Tonellotto and Craig Macdonald},
+  year = 2022
+}
+```
