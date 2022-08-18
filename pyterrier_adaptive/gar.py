@@ -14,7 +14,8 @@ class GAR(pt.Transformer):
 
     Required input columns: ['qid', 'query', 'docno', 'score', 'rank']
     Output columns: ['qid', 'query', 'docno', 'score', 'rank', 'iteration']
-    where iteration defines the batch number which identified the document. 
+    where iteration defines the batch number which identified the document. Specifically
+    even=initial retrieval   odd=corpus graph    -1=backfilled
     
     """
     def __init__(self,
