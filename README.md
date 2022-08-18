@@ -1,6 +1,6 @@
 # pyterrier_adaptive
 
-PyTerrier implementation of Adaptive Re-Ranking using a Corpus Graph (CIKM 2022).
+[PyTerrier](http://github.com/terrier-org/pyterrier) implementation of Adaptive Re-Ranking using a Corpus Graph (CIKM 2022).
 
 ## Getting Started
 
@@ -10,7 +10,7 @@ Install with pip:
 pip install --upgrade git+https://github.com/terrierteam/pyterrier_adaptive.git
 ```
 
-Basic Example over the MS MARCO passage corpus:
+Basic Example over the MS MARCO passage corpus (making use of the [pyterrier_t5](https://github.com/terrierteam/pyterrier_t5) and [pyterrier_pisa](https://github.com/terrierteam/pyterrier_pisa) plugins):
 
 ```python
 import pyterrier as pt
