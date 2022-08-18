@@ -12,6 +12,8 @@ pip install --upgrade git+https://github.com/terrierteam/pyterrier_adaptive.git
 
 Basic Example over the MS MARCO passage corpus (making use of the [pyterrier_t5](https://github.com/terrierteam/pyterrier_t5) and [pyterrier_pisa](https://github.com/terrierteam/pyterrier_pisa) plugins):
 
+Try examples in Google Colab! [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/terrierteam/pyterrier_adaptive/blob/master/examples/example.ipynb)
+
 ```python
 import pyterrier as pt
 pt.init()
