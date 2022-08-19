@@ -1,6 +1,6 @@
 # pyterrier_adaptive
 
-[PyTerrier](http://github.com/terrier-org/pyterrier) implementation of Adaptive Re-Ranking using a Corpus Graph (CIKM 2022).
+[PyTerrier](http://github.com/terrier-org/pyterrier) implementation of [Adaptive Re-Ranking using a Corpus Graph](https://arxiv.org/abs/2208.08942) (CIKM 2022).
 
 ## Getting Started
 
