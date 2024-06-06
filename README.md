@@ -97,7 +97,7 @@ graph8 = graph16.to_limit_k(8)
 
 # Citation
 
-Adaptive Re-Ranking with a Corpus Graph. Sean MacAvaney, Nicola Tonellotto and Craig Macdonald. In Proceedings of CIKM 2022, accepted.
+Adaptive Re-Ranking with a Corpus Graph. Sean MacAvaney, Nicola Tonellotto and Craig Macdonald. In Proceedings of CIKM 2022.
 
 ```bibtex
 @inproceedings{gar2022,
