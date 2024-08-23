@@ -29,7 +29,7 @@ setuptools.setup(
     packages=setuptools.find_packages(include=['pyterrier_adaptive']),
     install_requires=list(open('requirements.txt')),
     classifiers=[],
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     entry_points={
         'pyterrier.artifact': [
             'corpus_graph.np_topk = pyterrier_adaptive.corpus_graph:NpTopKCorpusGraph',
