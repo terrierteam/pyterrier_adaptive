@@ -11,6 +11,9 @@ import more_itertools
 from typing import Union, Tuple, List
 import ir_datasets
 from npids import Lookup
+import pyterrier as pt
+import pyterrier_alpha as pta
+
 try:
   from functools import cached_property
 except ImportError:
@@ -24,7 +27,7 @@ except ImportError:
 logger = ir_datasets.log.easy()
 
 
-class CorpusGraph:
+class CorpusGraph(pta.Artifact):
   def neighbours(self, docid: Union[int, str], weights: bool = False) -> Union[np.array, List[str], Tuple[np.array, np.array], Tuple[List[str], np.array]]:
     raise NotImplementedError()
 
@@ -37,11 +40,6 @@ class CorpusGraph:
     if fmt == 'np_topk' or fmt == 'numpy_kmax':
       return NpTopKCorpusGraph(path, **kwargs)
     raise ValueError(f'Unknown corpus graph format: {fmt}')
-
-  @staticmethod
-  def from_dataset(dataset: str, variant, version: str = 'latest', **kwargs):
-    from pyterrier.batchretrieve import _from_dataset
-    return _from_dataset(dataset, variant=variant, version=version, clz=CorpusGraph.load, **kwargs)
 
   # TODO: rework & verify
   # @staticmethod
@@ -129,6 +127,7 @@ class CorpusGraph:
       json.dump({
         'type': 'corpus_graph',
         'format': 'np_topk',
+        'package_hint': 'pyterrier-adaptive',
         'doc_count': len(docnos),
         'k': k,
       }, fout)
@@ -138,7 +137,7 @@ class CorpusGraph:
 
 class NpTopKCorpusGraph(CorpusGraph):
   def __init__(self, path, k=None):
-    self.path = Path(path)
+    super().__init__(path)
     with (self.path/'pt_meta.json').open('rt') as fin:
       self.meta = json.load(fin)
     assert self.meta.get('type') == 'corpus_graph' and self.meta.get('format') in ('numpy_kmax', 'np_topk')
