@@ -1,3 +1,7 @@
 python-terrier
 npids>=0.0.2
 pyterrier-alpha>=0.6.2
+torch
+pandas
+tqdm
+more_itertools

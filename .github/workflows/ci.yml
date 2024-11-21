@@ -43,7 +43,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip pytest
-        pip install pyterrier_pisa torch --extra-index-url https://download.pytorch.org/whl/cpu
+        pip install pyterrier_pisa torch transformers --extra-index-url https://download.pytorch.org/whl/cpu
         pip install --upgrade --upgrade-strategy eager -r requirements.txt
         
     - name: Run tests
