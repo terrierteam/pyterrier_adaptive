@@ -80,7 +80,7 @@ class Laff(pt.Transformer):
                 return_tensors='pt',
             ).to(self.device)
 
-            with torch.no_grad():
+            with torch.no_grad(), torch.autocast(device_type=self.device.type):
                 outputs = self.model(**enc)
                 affinity_scores += outputs.logits.flatten().tolist()
 
