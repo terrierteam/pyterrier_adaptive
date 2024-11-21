@@ -36,7 +36,7 @@ class Laff(pt.Transformer):
         self.max_length = max_length
         self.verbose = verbose
 
-    def compute_affinity_scores(self,
+    def compute_affinity(self,
         texts_left: Union[str, List[str]],
         texts_right: Union[str, List[str]]
     ) -> List[float]:
@@ -50,8 +50,7 @@ class Laff(pt.Transformer):
             A list of affinity scores.
         """
         if isinstance(texts_left, str) and isinstance(texts_right, str):
-            texts_left = [texts_left]
-            texts_right = [texts_right]
+            return self.compute_affinity([texts_left], [texts_right])[0]
         elif isinstance(texts_left, str):
             texts_left = [texts_left] * len(texts_right)
         elif isinstance(texts_right, str):
@@ -91,7 +90,7 @@ class Laff(pt.Transformer):
         Results are sorted by the left-side text and the affinity score.
         """
         pta.validate.columns(inp, includes=['text', 'other_text'])
-        affinity_scores = self.compute_affinity_scores(inp['text'], inp['other_text'])
-        res = inp.assign(affinity_score=affinity_scores)
-        res.sort_values(['text', 'affinity_score'], ascending=[True, False], inplace=True)
+        affinity = self.compute_affinity(inp['text'], inp['other_text'])
+        res = inp.assign(affinity=affinity)
+        res.sort_values(['text', 'affinity'], ascending=[True, False], inplace=True)
         return res
