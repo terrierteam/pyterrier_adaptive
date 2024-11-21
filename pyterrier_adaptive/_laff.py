@@ -1,10 +1,14 @@
 from typing import Optional, Union, List
+import shutil
 import torch
+import numpy as np
 import pandas as pd
 from tqdm import tqdm
+from itertools import count
 from more_itertools import chunked
 import pyterrier as pt
 import pyterrier_alpha as pta
+from pyterrier_adaptive import NpTopKCorpusGraph
 
 
 class Laff(pt.Transformer):
@@ -70,7 +74,7 @@ class Laff(pt.Transformer):
                 list(batch_left),
                 list(batch_right),
                 max_length=self.max_length,
-                padding='max_length',
+                padding='longest',
                 truncation=True,
                 return_attention_mask=True,
                 return_tensors='pt',
@@ -94,3 +98,48 @@ class Laff(pt.Transformer):
         res = inp.assign(affinity=affinity)
         res.sort_values(['text', 'affinity'], ascending=[True, False], inplace=True)
         return res
+
+    def apply_to_graph(self,
+        graph: NpTopKCorpusGraph,
+        text_loader: pt.Transformer,
+        out_path: Optional[str] = None,
+        *,
+        verbose: Optional[bool] = None
+    ) -> NpTopKCorpusGraph:
+        """ Apply the LAFF transformer to a corpus graph to construct a new one.
+
+        Args:
+            graph: the input corpus graph.
+            text_loader: a transformer that loads the text for a given document.
+            out_path: the path to save the output corpus graph. If not provided, the input graph's path is used with a '.laff' extension.
+            verbose: whether to display progress bars.
+        """
+        if out_path is None:
+            out_path = str(graph.path) + '.laff'
+        if verbose is None:
+            verbose = self.verbose
+
+        with pta.ArtifactBuilder(NpTopKCorpusGraph, path=out_path) as b:
+            shutil.copyfile(graph.path / 'docnos.npids', b.path / 'docnos.npids')
+            docnos = graph._docnos
+            doc_count = b.metadata['doc_count'] = len(docnos)
+            k = b.metadata['k'] = graph._k
+            with (b.path/'edges.u32.np').open('wb') as fe, (b.path/'weights.f16.np').open('wb') as fw:
+                it = zip(count(), docnos, graph.edges_data)
+                if verbose:
+                    it = tqdm(it, unit='doc', total=doc_count)
+                for did, docno, neighbor_ids in it:
+                    neighbor_ids = neighbor_ids[neighbor_ids != did] # ignore self-links
+                    texts = text_loader(pd.DataFrame({'docno': [docno] + list(docnos.fwd[neighbor_ids])}))['text']
+                    this_text, other_texts = texts[0], texts[1:]
+                    affinity = np.array(self.compute_affinity(this_text, other_texts))
+                    sort = np.argsort(-affinity)
+                    weights = affinity[sort].astype(np.float16)
+                    edges = neighbor_ids[sort].astype(np.uint32)
+                    if len(weights) < k: # pad up to k with self-links if needed
+                        weights = np.pad(weights, (0, k - len(weights)), constant_values=float('-inf'))
+                        edges = np.pad(edges, (0, k - len(edges)), constant_values=did)
+                    fe.write(edges.tobytes())
+                    fw.write(weights.tobytes())
+
+        return NpTopKCorpusGraph(out_path)
