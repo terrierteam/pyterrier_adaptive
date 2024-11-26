@@ -35,6 +35,9 @@ setuptools.setup(
             'corpus_graph.np_topk = pyterrier_adaptive.corpus_graph:NpTopKCorpusGraph',
         ],
     },
+    optional_dependencies={
+        'laff': ['transformers'],
+    },
     package_data={
         '': ['requirements.txt'],
     },
