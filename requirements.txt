@@ -5,4 +5,3 @@ torch
 pandas
 tqdm
 more_itertools
-transformers
