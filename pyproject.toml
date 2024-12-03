@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyterrier-adaptive"
+description = "PyTerrier implementation of Adaptive Re-Ranking using a Corpus Graph (CIKM 2022)"
+requires-python = ">=3.8"
+authors = [
+    { name = "Sean MacAvaney", email = "sean.macavaney@glasgow.ac.uk" }
+]
+maintainers = [
+  {name = "Sean MacAvaney", email = "sean.macavaney@glasgow.ac.uk"},
+]
+readme = "README.md"
+classifiers = [
+  "Programming Language :: Python",
+  "Operating System :: OS Independent",
+  "Topic :: Text Processing",
+  "Topic :: Text Processing :: Indexing",
+  "License :: OSI Approved :: MIT License",
+]
+dynamic = ["version", "dependencies"]
+
+[tool.setuptools.dynamic]
+version = {attr = "pyterrier_adaptive.__version__"}
+dependencies = {file = ["requirements.txt"]}
+
+[project.optional-dependencies]
+laff = ["transformers"]
+
+[tool.setuptools.packages.find]
+exclude = ["tests"]
+
+[project.urls]
+Repository = "https://github.com/terrierteam/pyterrier_adaptive"
+"Bug Tracker" = "https://github.com/terrierteam/pyterrier_adaptive/issues"
+
+[project.entry-points."pyterrier.artifact"]
+"corpus_graph.np_topk" = "pyterrier_adaptive.corpus_graph:NpTopKCorpusGraph"
