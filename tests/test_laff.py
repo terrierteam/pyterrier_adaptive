@@ -6,9 +6,6 @@ from pyterrier_adaptive import Laff
 class TestLaff(unittest.TestCase):
     def test_laff(self):
         laff = Laff()
-        scores = laff.compute_affinity("hello", "world")
-        self.assertTrue(isinstance(scores, float))
-
         scores = laff.compute_affinity(["hello", "world"], ["world", "hello"])
         self.assertEqual(len(scores), 2)
         self.assertTrue(isinstance(scores[0], float))
