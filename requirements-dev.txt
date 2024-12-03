@@ -1,3 +1,4 @@
+ruff
 pytest
 pytest-subtests
 pytest-cov

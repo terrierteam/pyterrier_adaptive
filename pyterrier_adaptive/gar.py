@@ -4,6 +4,7 @@ from collections import Counter
 import pyterrier as pt
 import pandas as pd
 import ir_datasets
+import pyterrier_adaptive
 logger = ir_datasets.log.easy()
 
 
@@ -20,7 +21,7 @@ class GAR(pt.Transformer):
     """
     def __init__(self,
         scorer: pt.Transformer,
-        corpus_graph: 'CorpusGraph',
+        corpus_graph: 'pyterrier_adaptive.CorpusGraph',
         num_results: int = 1000,
         batch_size: Optional[int] = None,
         backfill: bool = True,
