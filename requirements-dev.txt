@@ -1,0 +1,7 @@
+ruff
+pytest
+pytest-subtests
+pytest-cov
+pytest-json-report
+transformers
+pyterrier-pisa

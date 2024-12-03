@@ -1,17 +1,14 @@
 import pickle
 import tempfile
 from lz4.frame import LZ4FrameFile
-import shutil
 import json
 import numpy as np
 import pandas as pd
 from pathlib import Path
-import torch
 import more_itertools
 from typing import Union, Tuple, List
 import ir_datasets
 from npids import Lookup
-import pyterrier as pt
 import pyterrier_alpha as pta
 
 try:

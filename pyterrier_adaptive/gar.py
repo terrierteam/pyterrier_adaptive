@@ -4,38 +4,42 @@ from collections import Counter
 import pyterrier as pt
 import pandas as pd
 import ir_datasets
+import pyterrier_adaptive
 logger = ir_datasets.log.easy()
 
 
 class GAR(pt.Transformer):
-    """
-    A transformer that implements the Graph-based Adaptive Re-ranker algorithm from
-    MacAvaney et al. "Adaptive Re-Ranking with a Corpus Graph" CIKM 2022.
+    """A :class:`~pyterrier.Transformer` that implements Graph-based Adaptive Re-ranking (GAR).
 
-    Required input columns: ['qid', 'query', 'docno', 'score', 'rank']
-    Output columns: ['qid', 'query', 'docno', 'score', 'rank', 'iteration']
-    where iteration defines the batch number which identified the document. Specifically
-    even=initial retrieval   odd=corpus graph    -1=backfilled
+    Required input columns: ``['qid', 'query', 'docno', 'score', 'rank']``
+
+    Output columns: ``['qid', 'query', 'docno', 'score', 'rank', 'iteration']``
+
+    .. note::
+
+        The iteration column defines the batch number that first identified the document in the
+        results. Due to the alternating nature of the algorithm, ``even=initial retrieval``, ``odd=corpus graph``,
+        and ``-1=backfilled``.
     
+    .. cite.dblp:: conf/cikm/MacAvaneyTM22
     """
     def __init__(self,
         scorer: pt.Transformer,
-        corpus_graph: 'CorpusGraph',
+        corpus_graph: 'pyterrier_adaptive.CorpusGraph',
         num_results: int = 1000,
         batch_size: Optional[int] = None,
         backfill: bool = True,
         enabled: bool = True,
         verbose: bool = False):
         """
-            GAR init method
-            Args:
-                scorer(pyterrier.Transformer): A transformer that scores query-document pairs. It will only be provided with ['qid, 'query', 'docno', 'score'].
-                corpus_graph(pyterrier_adaptive.CorpusGraph): A graph of the corpus, enabling quick lookups of nearest neighbours
-                num_results(int): The maximum number of documents to score (called "budget" and $c$ in the paper)
-                batch_size(int): The number of documents to score at once (called $b$ in the paper). If not provided, will attempt to use the batch size from the scorer
-                backfill(bool): If True, always include all documents from the initial stage, even if they were not re-scored
-                enabled(bool): If False, perform re-ranking without using the corpus graph
-                verbose(bool): If True, print progress information
+        Args:
+            scorer(:class:`~pyterrier.Transformer`): A transformer that scores query-document pairs. It will only be provided with ['qid, 'query', 'docno', 'score'].
+            corpus_graph(:class:`~pyterrier_adaptive.CorpusGraph`): A graph of the corpus, enabling quick lookups of nearest neighbours
+            num_results(int): The maximum number of documents to score (called "budget" and $c$ in the paper)
+            batch_size(int): The number of documents to score at once (called $b$ in the paper). If not provided, will attempt to use the batch size from the scorer
+            backfill(bool): If True, always include all documents from the initial stage, even if they were not re-scored
+            enabled(bool): If False, perform re-ranking without using the corpus graph
+            verbose(bool): If True, print progress information
         """
         self.scorer = scorer
         self.corpus_graph = corpus_graph
