@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import pickle
 import tempfile
 from lz4.frame import LZ4FrameFile
@@ -24,19 +25,27 @@ except ImportError:
 logger = ir_datasets.log.easy()
 
 
-class CorpusGraph(pta.Artifact):
-  def neighbours(self, docid: Union[int, str], weights: bool = False) -> Union[np.array, List[str], Tuple[np.array, np.array], Tuple[List[str], np.array]]:
-    raise NotImplementedError()
+class CorpusGraph(pta.Artifact, ABC):
+  """This abstract class represents a corpus graph, which is a graph where each node represents a document
+  and edges represent a relationship between those documents (e.g., the most similar documents).
+  """
+  def __init__(self, path):
+    return super().__init__(path) # to avoid docstring from Artifact from pulling through
 
-  @staticmethod
-  def load(path, **kwargs):
-    with (Path(path)/'pt_meta.json').open('rt') as fin:
-      meta = json.load(fin)
-    assert meta.get('type') == 'corpus_graph'
-    fmt = meta.get('format')
-    if fmt == 'np_topk' or fmt == 'numpy_kmax':
-      return NpTopKCorpusGraph(path, **kwargs)
-    raise ValueError(f'Unknown corpus graph format: {fmt}')
+  @abstractmethod
+  def neighbours(self, docid: Union[int, str], weights: bool = False) -> Union[np.array, List[str], Tuple[np.array, np.array], Tuple[List[str], np.array]]:
+    """Abstract method. Implementations should return the nearest neighbors for the provided ``docid``.
+
+    ``docid`` can either be an integer or string. When an integer, it is treated as an internal docid. When a string, it is
+    treated as an external id (i.e., docno) and the corresponding internal id are looked up.
+
+    Returns either either a numpy array of other itnernal docids or a list of external docids, depending on the input.
+
+    Args:
+      docid: The internal or external id of the document.
+      weights: If True, also return the weights of the edges.
+    """
+    raise NotImplementedError()
 
   # TODO: rework & verify
   # @staticmethod
@@ -133,7 +142,16 @@ class CorpusGraph(pta.Artifact):
 
 
 class NpTopKCorpusGraph(CorpusGraph):
+  """A top-k neighbor corpus graph.
+
+  This class represents a corpus graph where each document is connected to its k nearest neighbors.
+  """
   def __init__(self, path, k=None):
+    """
+    Args:
+      path: The path to the directory containing the corpus graph.
+      k: The number of neighbors to keep for each document. If None, the original k is kept.
+    """
     super().__init__(path)
     with (self.path/'pt_meta.json').open('rt') as fin:
       self.meta = json.load(fin)
@@ -150,14 +168,16 @@ class NpTopKCorpusGraph(CorpusGraph):
     return f'NpTopKCorpusGraph({repr(str(self.path))}, k={self._k})'
 
   @cached_property
-  def edges_data(self):
+  def edges_data(self) -> np.array:
+    """Returns the edges data as a numpy array."""
     res = np.memmap(self._edges_path, mode='r', dtype=np.uint32).reshape(-1, self._data_k)
     if self._k != self._data_k:
       res = res[:, :self._k]
     return res
 
   @cached_property
-  def weights_data(self):
+  def weights_data(self) -> np.array:
+    """Returns the edge weight data as a numpy array."""
     res = np.memmap(self._weights_path, mode='r', dtype=np.float16).reshape(-1, self._data_k)
     if self._k != self._data_k:
       res = res[:, :self._k]
