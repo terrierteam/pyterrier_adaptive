@@ -58,7 +58,7 @@ class GAR(pt.Transformer):
         """
         result = {'qid': [], 'query': [], 'docno': [], 'rank': [], 'score': [], 'iteration': []}
 
-        df = dict(iter(df.groupby(by=['qid'])))
+        df = dict(iter(df.groupby(by='qid')))
         qids = df.keys()
         if self.verbose:
             qids = logger.pbar(qids, desc='adaptive re-ranking', unit='query')
