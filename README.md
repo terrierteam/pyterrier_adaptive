@@ -16,15 +16,14 @@ Try examples in Google Colab! [![Open In Colab](https://colab.research.google.co
 
 ```python
 import pyterrier as pt
-pt.init()
 from pyterrier_t5 import MonoT5ReRanker
 from pyterrier_pisa import PisaIndex
-from pyterrier_adaptive import GAR, CorpusGraph
+from pyterrier_adaptive import GAR, NpTopKCorpusGraph
 
 dataset = pt.get_dataset('irds:msmarco-passage')
 retriever = PisaIndex.from_dataset('msmarco_passage').bm25()
 scorer = pt.text.get_text(dataset, 'text') >> MonoT5ReRanker(verbose=False, batch_size=16)
-graph = CorpusGraph.from_dataset('msmarco_passage', 'corpusgraph_bm25_k16').to_limit_k(8)
+graph = NpTopKCorpusGraph.from_dataset('msmarco_passage', 'corpusgraph_bm25_k16').to_limit_k(8)
 
 pipeline = retriever >> GAR(scorer, graph) >> pt.text.get_text(dataset, 'text')
 
