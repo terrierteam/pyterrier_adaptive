@@ -1,4 +1,4 @@
-python-terrier
+pyterrier>=1.0
 npids>=0.0.2
 pyterrier-alpha>=0.6.2
 torch
